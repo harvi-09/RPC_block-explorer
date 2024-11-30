@@ -1,139 +1,136 @@
-  import React from "react";
-  import { useState } from "react";
-  import axios from "axios";
-  import Card from "./components/Card";
-  import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
-  import TransactionPage from "./components/TransactionPage";
-
-  const App = () => {
-    const [blockhash, setblockhash] = useState("");
-    const [verbosity, setverbosity] = useState(1);
-    const [blockData, setBlockData] = useState(null);
-
-    const handleChange = (event) => {
-      setblockhash(event.target.value);
-    };
-
-    const handleSubmit = async (event) => {
-      event.preventDefault();
-    
-      try {
-        const response = await axios.post("http://localhost:3001/getblock", {
-          blockhash,
-          verbosity,
-        });
-        setBlockData(response.data.block);
-      } catch (error) {
-        console.error("Error fetching block data:", error.message);
-      }
-    };
-
-    const handlejump = async(event,hash) =>{
-      event.preventDefault()
-      setblockhash(hash);
-      try {
-        const response = await axios.post("http://localhost:3001/getblock", {
-          blockhash,
-          verbosity,
-        });
-        setBlockData(response.data.block);
-      } catch (error) {
-        console.error("Error fetching block data:", error.message);
-      }
+import React from "react";
+import { useState } from "react";
+import axios from "axios";
+import Card from "./components/Card";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import TransactionPage from "./components/TransactionPage";
+import Input from "./components/Input";
+import './style.css';
 
 
+const App = () => {
+  const [blockhash, setblockhash] = useState("");
+  const [verbosity, setverbosity] = useState(1);
+  const [blockData, setBlockData] = useState(null);
 
-    }
-
-    console.log(blockData);
-    return (
-      <>
-        <h1 align="center">BLOCK DATA</h1>
-        <form align="center" onSubmit={handleSubmit}>
-          <label htmlFor="textInput">Enter Block hash:</label>
-          <input
-            id="textInput"
-            type="text"
-            value={blockhash}
-            onChange={handleChange}
-          />
-          <button type="submit">Submit</button>
-        </form>
-
-        {blockData ? (
-          <div>
-            {/* <pre>{JSON.stringify(blockData, null, 2)}</pre> Display full data for debugging */}
-            <Router>
-              <div style={{ padding: "20px" }}>
-                <Routes>
-                  <Route
-                    path="/"
-                    element={
-                      <>
-                        {/* Display all data */}
-                        {Object.entries(blockData).map(([key, value], index) => (
-                          <Card
-                            key={index}
-                            label={key}
-                            value={
-                              key === "tx" ? (
-                                value.map((txId, idx) => (
-                                  <div key={idx}>
-                                    <Link
-                                      to={`/transaction/${blockhash}/${txId}`}
-                                    >
-                                      {txId}
-                                    </Link>
-                                  </div>
-                                ))
-                              ) : key === "cbTx" ? (
-                                
-                                <div>
-                                  <pre>{JSON.stringify(value, null, 2)}</pre>{" "}
-                                </div>
-                              ): key === "previousblockhash" ? (
-                                
-                                <div>
-                                  
-                                  <Link
-                                      to={`/`} onClick={(event)=>{handlejump(event, blockData.previousblockhash)}}
-                                    >
-                                      {blockData.previousblockhash}
-                                    </Link>
-                                </div>
-                              )  : key === "nextblockhash" ? (
-                                
-                                <div>
-                                  
-                                  <p>{blockData.nextblockhash}</p>
-                                </div>
-                              )  
-                              
-                              : (
-                                value.toString()
-                              )
-                            }
-                          />
-                        ))}
-                      </>
-                    }
-                  />
-                  {/* Dynamic route for transaction details */}
-                  <Route
-                    path="/transaction/:blockhash/:txId"
-                    element={<TransactionPage />}
-                  />
-                </Routes>
-              </div>
-            </Router>
-          </div>
-        ) : (
-          <p align="center">
-            No data available. Enter a valid block hash and submit.
-          </p>
-        )}
-      </>
-    );
+  const handleChange = (event) => {
+    setblockhash(event.target.value);
   };
 
-  export default App;
+  const callAPI = async (blockhash) => {
+
+    const isBlockNumber = !isNaN(blockhash) && Number.isInteger(Number(blockhash));
+    const isBlockHash = typeof blockhash === "string" && /^[a-fA-F0-9]{64}$/.test(blockhash);
+
+
+    let blockDataPayload;
+
+    if (isBlockNumber) {
+      console.log("Block number provided:", blockhash);
+      // blockDataPayload = { blocknumber: Number(blockhash), verbosity: 2 }; // Adjust verbosity as needed
+    } else {
+      console.log("Block hash provided:", blockhash);
+      blockDataPayload = { blockhash: blockhash, verbosity: 2 }; // Adjust verbosity as needed
+      try {
+        console.log("hash : ", blockhash);
+        const response = await axios.post("http://localhost:3001/getblock", {
+          blockDataPayload
+        });
+        console.log("response.data.block ", response.data.block)
+        setBlockData(response.data.block);
+      } catch (error) {
+        console.error("Error fetching block data:", error.message);
+      }
+    }
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    await callAPI(blockhash);
+    setblockhash("")
+  };
+
+  return (
+    <>
+     <h1  align="center">BLOCK DATA</h1>
+     <div id="body">
+        <Input handleSubmit={handleSubmit} blockhash={blockhash} handleChange={handleChange}/>           
+
+            {blockData ? (
+              <div>
+                {/* <pre>{JSON.stringify(blockData, null, 2)}</pre> Display full data for debugging */}
+                <Router>
+                  <div style={{ padding: "20px" }}>
+                    <Routes>
+                      <Route
+                        path="/"
+                        element={
+                          <>
+                            {/* Display all data */}
+                            {Object.entries(blockData).map(([key, value], index) => (
+                              <Card
+                                key={index}
+                                label={key}
+                                value={
+                                  key === "tx" ? (
+                                    value.map((tx, index) => (
+                                      <div key={index}>
+                                        <Link className="link" to={`/transaction/${blockData.hash}/${tx.txid}`}>
+                                          {tx.txid}
+                                        </Link>
+                                      </div>
+                                    ))
+                                    
+                                  ) : key === "cbTx" || typeof value === "object" ? (
+                                    <div>
+                                      <pre>{JSON.stringify(value, null, 2)}</pre>{" "}
+                                    </div>
+                                  ) : key === "previousblockhash" ? (
+                                    <div>
+                                      <p
+                                        className="link"
+                                        onClick={async () => {
+                                          await callAPI(blockData.previousblockhash);
+                                        }}
+                                      >
+                                        {blockData.previousblockhash}
+                                      </p>
+                                    </div>
+                                  ) : key === "nextblockhash" ? (
+                                    <p
+                                      className="link"
+                                      onClick={async () => {
+                                        await callAPI(blockData.nextblockhash);
+                                      }}
+                                    >
+                                      {blockData.nextblockhash}
+                                    </p>
+                                  ) : (
+                                    value.toString()
+                                  )
+                                }
+                              />
+                            ))}
+                          </>
+                        }
+                      />
+                      {/* Dynamic route for transaction details */}
+                      <Route
+                        path="/transaction/:blockhash/:txId"
+                        element={<TransactionPage />}
+                      />
+                    </Routes>
+                  </div>
+                </Router>
+              </div>
+            ) : (
+              <p align="center">
+                No data available. Enter a valid block hash and submit.
+              </p>
+            )}
+     </div>
+    </>
+  );
+};
+
+export default App;
