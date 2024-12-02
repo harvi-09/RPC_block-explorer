@@ -1,4 +1,3 @@
-
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -20,58 +19,63 @@ RpcClient.config.logger = "normal";
 
 const rpc = new RpcClient(config);
 
-
-app.post("/getblock", (req, res) => {
-  const {blockDataPayload} = req.body;
-  
-  if (!blockDataPayload.blockhash || typeof blockDataPayload.verbosity !== "number") {
-    return res.status(400).json({ error: "Invalid blockhash or verbosity" });
-  }
-
-  rpc.getBlock(blockDataPayload.blockhash, blockDataPayload.verbosity, (err, result) => {
-    if (err) {
-      console.error("Error fetching block:", err.message);
-      res.status(500).json({ error: err.message });
-    } else {
-      res.json({ block: result.result });
-    }
-  });
-});
-
-
-app.post("/getblockhash", (req, res) => {
-  const {blockHashPayload} = req.body;
+app.post("/getblockbynumber", (req, res) => {
+  const { blockHashPayload } = req.body;
+  console.log("blockHashPayload ", blockHashPayload);
 
   if (!Number.isInteger(blockHashPayload.blocknumber)) {
     return res.status(400).json({ error: "Invalid blockhash or verbosity" });
   }
 
-  rpc.getblockhash(blockHashPayload.blocknumber,  (err, result) => {
+  rpc.getblockhash(blockHashPayload.blocknumber, (err, result) => {
     if (err) {
       console.error("Error fetching block:", err.message);
       res.status(500).json({ error: err.message });
     } else {
-      
-      res.json({ hash: result.result });
-      
+      rpc.getBlock(result.result, 1, (err, result) => {
+        if (err) {
+          console.error("Error fetching block:", err.message);
+          res.status(500).json({ error: err.message });
+        } else {
+          res.json({ block: result.result });
+        }
+      });
     }
   });
 });
 
-app.post("/getrawtransaction", (req, res) => {
-  const { txId, blockhash } = req.body;
+app.post("/getdata", (req, res) => {
+  const { blockDataPayload } = req.body;
 
+  rpc.getBlock(
+    blockDataPayload.blockhash,
+    blockDataPayload.verbosity,
+    (err, result) => {
+      if (err) {
+        console.error("Error getting block data:", err.message);
 
-  rpc.getrawtransaction(txId, blockhash, (err, result) => {
-    if (err) {
-      console.error("Error fetching transaction:", err.message);
-      return res.status(500).json({ error: err.message });
+        rpc.getrawtransaction(
+          blockDataPayload.blockhash,
+          blockDataPayload.verbosity,
+          (err, result) => {
+            if (err) {
+              console.error("Error getting transaction data:", err.message);
+              return res
+                .status(500)
+                .json({ error: "Failed to fetch data: " + err.message });
+            }
+
+            res.json({ data: result });
+          }
+        );
+
+        return;
+      }
+
+      res.json({ data: result });
     }
-
-    res.json({ block: result.result, blockhash: blockhash });
-  });
+  );
 });
-
 
 app.listen(3001, () => {
   console.log("Server running on http://localhost:3001");

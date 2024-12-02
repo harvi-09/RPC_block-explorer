@@ -1,9 +1,9 @@
 import React from "react";
 import "./input.css";
 
-const Input = ({ handleSubmit, handleChange, blockhash }) => {
+const Input = ({ handleSubmit, handleChange, blockhash}) => {
   return (
-    <div>
+    <div style={{marginBottom:"50px"}}>
       <form align="center" onSubmit={handleSubmit}>
         <input
           id="textInput"
@@ -13,6 +13,9 @@ const Input = ({ handleSubmit, handleChange, blockhash }) => {
           placeholder="enter blockhash or block number"
         />
         <button type="submit">Submit</button>
+
+        
+       
       </form>
     </div>
   );
