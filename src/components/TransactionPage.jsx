@@ -26,34 +26,27 @@ const TransactionPage = () => {
 
   // console.log(response.data.block)
   return (
-    <div
-      style={{ padding: "20px", textAlign: "center" }}
-    >
-      <h2 style={{color:"white"}}>Transaction Details</h2>
-     
+    <div style={{ padding: "20px", textAlign: "center" }}>
+      <h2 style={{ color: "white" }}>Transaction Details</h2>
 
-   
       {txData && (
-        <div style={{ padding: "20px", maxWidth:"80vw" }}
-         >
-          
-         { console.log(txData)}
+        <div style={{ padding: "20px", maxWidth: "80vw" }}>
+          {console.log(txData)}
           {Object.entries(txData).map(([key, value], index) => (
-                              
-                              <Card
-                                key={index}
-                                label={key}
-                                value={
-                                   key === "cbTx" || typeof value === "object" ? (
-                                    <div>
-                                      <pre>{JSON.stringify(value, null, 2)}</pre>{" "}
-                                    </div>
-                                  ) : (
-                                    value.toString()
-                                  )
-                                }
-                              />
-                            ))}
+            <Card
+              key={index}
+              label={key}
+              value={
+                key === "cbTx" || typeof value === "object" ? (
+                  <div>
+                    <pre>{JSON.stringify(value, null, 2)}</pre>{" "}
+                  </div>
+                ) : (
+                  value.toString()
+                )
+              }
+            />
+          ))}
         </div>
       )}
     </div>

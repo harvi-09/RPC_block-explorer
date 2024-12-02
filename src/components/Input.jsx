@@ -1,23 +1,21 @@
-import React from 'react'
-import './input.css'
+import React from "react";
+import "./input.css";
 
-const Input = ({handleSubmit,handleChange,blockhash}) => {
+const Input = ({ handleSubmit, handleChange, blockhash }) => {
   return (
     <div>
-
-<form align="center" onSubmit={handleSubmit}>
-        
+      <form align="center" onSubmit={handleSubmit}>
         <input
           id="textInput"
           type="text"
           value={blockhash}
           onChange={handleChange}
-          placeholder='enter blockhash or block number'
+          placeholder="enter blockhash or block number"
         />
         <button type="submit">Submit</button>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default Input
+export default Input;
