@@ -1,15 +1,18 @@
 #cardStyle {
-   
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  overflow: auto;
     border-radius: 8px;
     padding: 16px;
     max-width: 80%%;
     margin: 10px auto;
     text-align: left;
     font-family: Arial, sans-serif;
-    word-break: break-word;
+    word-wrap: break-word;
     color: #011b35; /* Text color */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
     background: linear-gradient(135deg, #ffffff23, #ffffff23); /* Gradient background */
+    
   }
   
   #lablestyle {
@@ -20,5 +23,6 @@
   
   #valueStyle {
     color: #ffffff9a; /* Dark blue for values */
+    word-wrap: break-word;
   }
   

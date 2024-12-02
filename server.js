@@ -38,6 +38,26 @@ app.post("/getblock", (req, res) => {
   });
 });
 
+
+app.post("/getblockhash", (req, res) => {
+  const {blockHashPayload} = req.body;
+
+  if (!Number.isInteger(blockHashPayload.blocknumber)) {
+    return res.status(400).json({ error: "Invalid blockhash or verbosity" });
+  }
+
+  rpc.getblockhash(blockHashPayload.blocknumber,  (err, result) => {
+    if (err) {
+      console.error("Error fetching block:", err.message);
+      res.status(500).json({ error: err.message });
+    } else {
+      
+      res.json({ hash: result.result });
+      
+    }
+  });
+});
+
 app.post("/getrawtransaction", (req, res) => {
   const { txId, blockhash } = req.body;
 

@@ -10,8 +10,8 @@ import './style.css';
 
 const App = () => {
   const [blockhash, setblockhash] = useState("");
-  const [verbosity, setverbosity] = useState(1);
   const [blockData, setBlockData] = useState(null);
+  const [blockNum, setblockNum] = useState("")
 
   const handleChange = (event) => {
     setblockhash(event.target.value);
@@ -19,20 +19,29 @@ const App = () => {
 
   const callAPI = async (blockhash) => {
 
-    const isBlockNumber = !isNaN(blockhash) && Number.isInteger(Number(blockhash));
-    const isBlockHash = typeof blockhash === "string" && /^[a-fA-F0-9]{64}$/.test(blockhash);
+      const isBlockNumber = !isNaN(blockhash) && Number.isInteger(Number(blockhash));
+      // const isBlockHash = typeof blockhash === "string" && /^[a-fA-F0-9]{64}$/.test(blockhash);
 
 
-    let blockDataPayload;
+      let blockDataPayload;
+      let blockHashPayload;
 
-    if (isBlockNumber) {
-      console.log("Block number provided:", blockhash);
-      // blockDataPayload = { blocknumber: Number(blockhash), verbosity: 2 }; // Adjust verbosity as needed
-    } else {
-      console.log("Block hash provided:", blockhash);
+      if (isBlockNumber) {
+        // -----------get-block-hash---------------
+        blockHashPayload = { blocknumber: Number(blockhash)}; 
+        try {
+          const blockHash = await axios.post("http://localhost:3001/getblockhash", {
+            blockHashPayload
+          });
+          setblockNum(blockHash.data.hash);
+          blockhash = blockHash.data.hash;
+        } catch (error) {
+          console.error("Error fetching block data:", error.message);
+        }
+      }
+
       blockDataPayload = { blockhash: blockhash, verbosity: 2 }; // Adjust verbosity as needed
       try {
-        console.log("hash : ", blockhash);
         const response = await axios.post("http://localhost:3001/getblock", {
           blockDataPayload
         });
@@ -41,7 +50,6 @@ const App = () => {
       } catch (error) {
         console.error("Error fetching block data:", error.message);
       }
-    }
   };
 
   const handleSubmit = async (event) => {
@@ -55,7 +63,6 @@ const App = () => {
      <h1  align="center">BLOCK DATA</h1>
      <div id="body">
         <Input handleSubmit={handleSubmit} blockhash={blockhash} handleChange={handleChange}/>           
-
             {blockData ? (
               <div>
                 {/* <pre>{JSON.stringify(blockData, null, 2)}</pre> Display full data for debugging */}
