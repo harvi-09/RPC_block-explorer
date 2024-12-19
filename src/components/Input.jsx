@@ -3,7 +3,7 @@ import "./input.css";
 
 const Input = ({ handleSubmit, handleChange, blockhash}) => {
   return (
-    <div style={{marginBottom:"50px"}}>
+    <div style={{marginBottom:"50px", display:"flex", justifyContent:"center"}}>
       <form align="center" onSubmit={handleSubmit}>
         <input
           id="textInput"

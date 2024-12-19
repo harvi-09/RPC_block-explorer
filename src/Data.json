@@ -1,0 +1,43 @@
+
+
+
+
+
+[
+    {
+        "name": "version",
+        "size": "4"
+    },
+    {
+        "name": "hashPrevBlock",
+        "size": "32"
+    },
+    {
+        "name": "hashMerkleRoot",
+        "size": "32"
+    },
+    {
+        "name": "time",
+        "size": "4"
+    },
+    {
+        "name": "bits",
+        "size": "4"
+    },
+    {
+        "name": "Nonce",
+        "size": "4"
+    },
+    {
+        "name": "newNonce",
+        "size": "8"
+    },
+    {
+        "name": "height",
+        "size": "4"
+    },{
+        "name": "txCount",
+        "size": "1"
+    }
+]
+

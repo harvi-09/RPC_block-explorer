@@ -1,10 +1,64 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import Input from "./Input";
 import Card from "./Card";
+import { useState } from "react";
+import axios from "axios";
 
-const CardContainer = ({ blockData, callAPI }) => {
+const CardContainer = ({}) => {
+  const [blockhash, setblockhash] = useState("");
+  const [blockData, setBlockData] = useState(null);
+
+  const handleChange = (event) => {
+    console.log("event.target.value ", event.target.value);
+    setblockhash(event.target.value);
+  };
+
+  const callAPI = async (blockhash) => {
+
+    const isBlockNumber =
+      !isNaN(blockhash) && Number.isInteger(Number(blockhash));
+
+    if (isBlockNumber) {
+      // -----------get-block-hash---------------
+      const blockHashPayload = { blocknumber: Number(blockhash) };
+      try {
+        const response = await axios.post(
+          "http://localhost:3001/getblockbynumber",
+          {
+            blockHashPayload,
+          }
+        );
+       
+        setBlockData(response.data.block);
+      } catch (error) {
+        console.error("Error fetching block data:", error.message);
+      }
+      return;
+    }
+
+    const blockDataPayload = { blockhash: blockhash, verbosity: 1 }; // Adjust verbosity as needed
+    try {
+      console.log("blockDataPayload :", blockDataPayload);
+      const response = await axios.post("http://localhost:3001/getdata", {
+        blockDataPayload,
+      });
+      setBlockData(response.data.data.result);
+    } catch (error) {
+      console.error("Error fetching block data:", error.message);
+    }
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    await callAPI(blockhash);
+    setblockhash("");
+  };
+
   return (
     <>
+     <Input
+          handleSubmit={handleSubmit} handleChange={handleChange} blockhash={blockhash}
+        />
       {blockData ? (
         <>
           {/* Display all data */}

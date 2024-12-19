@@ -64,7 +64,6 @@ app.post("/getdata", (req, res) => {
                 .status(500)
                 .json({ error: "Failed to fetch data: " + err.message });
             }
-
             res.json({ data: result });
           }
         );
@@ -76,6 +75,25 @@ app.post("/getdata", (req, res) => {
     }
   );
 });
+
+app.post("/decoderawtransaction", (req, res) => {
+  const { txDataPayload } = req.body;
+  console.log("txDataPayload ", txDataPayload);
+
+ 
+  rpc.decoderawtransaction(txDataPayload.txHex, (err, result) => {
+     
+     
+        if (err) {
+          console.error("Error fetching block:", err.message);
+          res.status(500).json({ error: err.message });
+        } else {
+          res.json({ txData: result.result });
+        }
+      });
+    
+  });
+
 
 app.listen(3001, () => {
   console.log("Server running on http://localhost:3001");

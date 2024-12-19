@@ -1,0 +1,18 @@
+.button{
+    padding: 10px 20px;
+    background-color: #523955; /* Dark blue */
+    color: #fde6ec; /* Light pastel pink */
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+ul{
+    list-style-type: none;
+    display: flex;
+    
+}
+li{
+    margin-right: 25px;
+}
